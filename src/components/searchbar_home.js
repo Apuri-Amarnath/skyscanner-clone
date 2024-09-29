@@ -31,12 +31,14 @@ const SimplifiedMultiCitySearchBar = () => {
   const [directFlights, setDirectFlights] = useState(false);
 
   const handleSearch = () => {
-    const formattedDepartDate = departDate
-      ? format(departDate, "yyyy-MM-dd")
-      : "";
-    const formattedReturnDate = returnDate
-      ? format(returnDate, "yyyy-MM-dd")
-      : "";
+    const formattedDepartDate =
+      departDate instanceof Date && !isNaN(departDate.getTime())
+        ? format(departDate, "yyyy-MM-dd")
+        : "";
+    const formattedReturnDate =
+      returnDate instanceof Date && !isNaN(returnDate.getTime())
+        ? format(returnDate, "yyyy-MM-dd")
+        : "";
     console.log("Search clicked", {
       from,
       to,
@@ -77,6 +79,7 @@ const SimplifiedMultiCitySearchBar = () => {
     value,
     onChange,
     startAdornment,
+    InputProps,
     ...props
   }) => (
     <FormControl fullWidth variant="outlined" sx={inputStyle}>
@@ -91,8 +94,19 @@ const SimplifiedMultiCitySearchBar = () => {
         startAdornment={
           <InputAdornment position="start">{startAdornment}</InputAdornment>
         }
+        {...InputProps}
         {...props}
         sx={{
+          bgcolor: "white", // Ensure the input field has a white background
+          "& .MuiOutlinedInput-notchedOutline": {
+            border: "none", // Optional: Remove outline
+          },
+          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#666", // Change border color on focus if needed
+          },
+          "& .MuiInputBase-input": {
+            color: "#333", // Text color
+          },
           "& .MuiOutlinedInput-root": {
             paddingTop: "20px", // Ensure the input field has some top padding
           },
@@ -136,42 +150,39 @@ const SimplifiedMultiCitySearchBar = () => {
           </Grid>
           <Grid item xs={12} sm={6} md={2.4}>
             <DatePicker
+              sx={{ bgcolor: "white" }}
               label="Depart"
               value={departDate}
               onChange={(newValue) => setDepartDate(newValue)}
-              slots={{
-                textField: (params) => (
-                  <CustomInput
-                    {...params}
-                    startAdornment={<CalendarTodayIcon color="action" />}
-                  />
-                ),
-              }}
-              slotProps={{
-                textField: {
-                  sx: { bgcolor: "white" },
-                },
-              }}
+              renderInput={(params) => (
+                <CustomInput
+                  {...params}
+                  startAdornment={<CalendarTodayIcon color="action" />}
+                  InputProps={{
+                    ...params.InputProps,
+                    sx: {
+                      bgcolor: "white", // Set the background color to white
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "rgba(0, 0, 0, 0.23)", // Adjust border color if needed
+                      },
+                    },
+                  }}
+                />
+              )}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={2.4}>
             <DatePicker
+              sx={{ bgcolor: "white" }}
               label="Return"
               value={returnDate}
               onChange={(newValue) => setReturnDate(newValue)}
-              slots={{
-                textField: (params) => (
-                  <CustomInput
-                    {...params}
-                    startAdornment={<CalendarTodayIcon color="action" />}
-                  />
-                ),
-              }}
-              slotProps={{
-                textField: {
-                  sx: { bgcolor: "white" },
-                },
-              }}
+              renderInput={(params) => (
+                <CustomInput
+                  {...params}
+                  startAdornment={<CalendarTodayIcon color="action" />}
+                />
+              )}
             />
           </Grid>
           <Grid item xs={12} md={2.4}>
