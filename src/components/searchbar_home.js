@@ -13,29 +13,35 @@ import {
   InputLabel,
   OutlinedInput,
 } from "@mui/material";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import PersonIcon from "@mui/icons-material/Person";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 const SimplifiedMultiCitySearchBar = () => {
   const [from, setFrom] = useState("India (IN)");
   const [to, setTo] = useState("");
-  const [departDate, setDepartDate] = useState("");
-  const [returnDate, setReturnDate] = useState("");
+  const [departDate, setDepartDate] = useState(null);
+  const [returnDate, setReturnDate] = useState(null);
   const [travelers, setTravelers] = useState("1 Adult, Economy");
   const [addNearbyAirports, setAddNearbyAirports] = useState(false);
   const [directFlights, setDirectFlights] = useState(false);
 
   const handleSearch = () => {
+    const formattedDepartDate = departDate
+      ? format(departDate, "yyyy-MM-dd")
+      : "";
+    const formattedReturnDate = returnDate
+      ? format(returnDate, "yyyy-MM-dd")
+      : "";
     console.log("Search clicked", {
       from,
       to,
-      departDate,
-      returnDate,
+      departDate: formattedDepartDate,
+      returnDate: formattedReturnDate,
       travelers,
       addNearbyAirports,
       directFlights,
@@ -96,7 +102,7 @@ const SimplifiedMultiCitySearchBar = () => {
   );
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box sx={{ p: 2, bgcolor: "#042759", borderRadius: 2 }}>
         <Typography variant="h6" sx={{ color: "white", mb: 2 }}>
           Create a multi-city route
@@ -133,12 +139,19 @@ const SimplifiedMultiCitySearchBar = () => {
               label="Depart"
               value={departDate}
               onChange={(newValue) => setDepartDate(newValue)}
-              renderInput={(params) => (
-                <CustomInput
-                  {...params}
-                  startAdornment={<CalendarTodayIcon color="action" />}
-                />
-              )}
+              slots={{
+                textField: (params) => (
+                  <CustomInput
+                    {...params}
+                    startAdornment={<CalendarTodayIcon color="action" />}
+                  />
+                ),
+              }}
+              slotProps={{
+                textField: {
+                  sx: { bgcolor: "white" },
+                },
+              }}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={2.4}>
@@ -146,12 +159,19 @@ const SimplifiedMultiCitySearchBar = () => {
               label="Return"
               value={returnDate}
               onChange={(newValue) => setReturnDate(newValue)}
-              renderInput={(params) => (
-                <CustomInput
-                  {...params}
-                  startAdornment={<CalendarTodayIcon color="action" />}
-                />
-              )}
+              slots={{
+                textField: (params) => (
+                  <CustomInput
+                    {...params}
+                    startAdornment={<CalendarTodayIcon color="action" />}
+                  />
+                ),
+              }}
+              slotProps={{
+                textField: {
+                  sx: { bgcolor: "white" },
+                },
+              }}
             />
           </Grid>
           <Grid item xs={12} md={2.4}>
@@ -177,6 +197,12 @@ const SimplifiedMultiCitySearchBar = () => {
                 <Checkbox
                   checked={addNearbyAirports}
                   onChange={(e) => setAddNearbyAirports(e.target.checked)}
+                  sx={{
+                    color: "white", // Set the checkbox color when unchecked
+                    "&.Mui-checked": {
+                      color: "white", // Set the checkbox color when checked
+                    },
+                  }}
                 />
               }
               label="Add nearby airports"
@@ -187,6 +213,12 @@ const SimplifiedMultiCitySearchBar = () => {
                 <Checkbox
                   checked={directFlights}
                   onChange={(e) => setDirectFlights(e.target.checked)}
+                  sx={{
+                    color: "white", // Set the checkbox color when unchecked
+                    "&.Mui-checked": {
+                      color: "white", // Set the checkbox color when checked
+                    },
+                  }}
                 />
               }
               label="Direct flights"
